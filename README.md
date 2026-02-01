@@ -1,4 +1,4 @@
-# Sieve
+# Sieve - Image Viewer
 ---
 
 ### Install
@@ -6,6 +6,7 @@
 ```bash
 # clone repo
 git clone https://github.com/zakcole08/sieve.git
+cd sieve
 # compile
 gcc sieve.c -o sieve `sdl2-config --cflags --libs`
 ```
