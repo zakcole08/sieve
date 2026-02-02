@@ -19,11 +19,11 @@ cat <filename> | ./sieve
 
 ### Notes
 
-- Currently only passes in the dimensions of the image and displays solid colour
 - Currently only supports .ppm image format
+- Doesn't work on PPM's that have comment lines
 
 ### ToDo
 
-- Read individual pixel rgb values and display to the window
+- Add parsing and proper handling for max colour value and comment line
 - Add functionality to pass filename as an argument
 - Add support for new image formats
