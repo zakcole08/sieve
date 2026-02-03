@@ -8,8 +8,22 @@
 const char *title = "Image Viewer";
 const int pix_h = 1, pix_w = 1;
 
-int main() {
-	FILE *pfile = stdin;
+void print_usage() {
+	printf("Usage: ./sieve <filename>\n");
+}
+
+int main(int argc, char *argv[]) {
+	if (argc < 2) {
+		printf("You must specify an image file.\n");
+		print_usage();
+		exit(1);
+	}
+	FILE *pfile = fopen(argv[1], "r");
+	if (pfile == NULL) {
+		printf("Unable to open file %s\n", argv[1]);
+		print_usage();
+		exit(1);
+	}
 	char *ptemp = calloc(1000, sizeof(char));
 	// Read first line (specifier P3 or P6 - ignore here)
 	fgets(ptemp, 1000, pfile);
@@ -44,9 +58,9 @@ int main() {
 	SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
 	for (int y = 0; y <= win_h; y++) {
 		for (int x = 0; x <= win_w; x++) {
-			r = getchar();
-			g = getchar();
-			b = getchar();
+			r = fgetc(pfile);
+			g = fgetc(pfile);
+			b = fgetc(pfile);
 			colour = SDL_MapRGB(psurface->format, r, g, b);
 			pixel.x = x;
 			pixel.y = y;
