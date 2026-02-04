@@ -27,6 +27,7 @@ int main(int argc, char *argv[]) {
 	char *pline = calloc(1000, sizeof(char));
 	char *pdimensions = calloc(1000, sizeof(char));
 	int counter = 0;
+	char format[4];
 
 	while (fgets(pline, 1000, pfile) != NULL) {
 		// Ignore comments
@@ -35,8 +36,9 @@ int main(int argc, char *argv[]) {
 		}
 		counter++;
 		if (counter == 1) {
-			// Read first line (specifier P3 or P6 - ignore here)
-			printf("line %d: %s", counter, pline);
+			// Read first line (specifier P3 or P6)
+			strcpy(format, pline);
+			printf("line %d: %s", counter, format);
 			continue;
 		} else if (counter == 2) {
 			// Read second line (width height)
@@ -71,20 +73,46 @@ int main(int argc, char *argv[]) {
 	Uint8 r, g, b;
 	int x = 0, y = 0;
 	Uint32 colour = 0;
+
+	void draw_p3() {
+		for (int y = 0; y <= win_h; y++) {
+			for (int x = 0; x <= win_w; x++) {			
+				SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
+				fscanf(pfile, "%hhd %hhd %hhd", &r, &g, &b);
+				colour = SDL_MapRGB(psurface->format, r, g, b);
+				pixel.x = x;
+				pixel.y = y;
+				SDL_FillRect(psurface, &pixel, colour);
+			}
+		}
+	}
 	
-	SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
-	for (int y = 0; y <= win_h; y++) {
-		for (int x = 0; x <= win_w; x++) {
-			r = fgetc(pfile);
-			g = fgetc(pfile);
-			b = fgetc(pfile);
-			colour = SDL_MapRGB(psurface->format, r, g, b);
-			pixel.x = x;
-			pixel.y = y;
-			SDL_FillRect(psurface, &pixel, colour);
+	void draw_p6() {
+		SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
+		for (int y = 0; y <= win_h; y++) {
+			for (int x = 0; x <= win_w; x++) {
+				r = fgetc(pfile);
+				g = fgetc(pfile);
+				b = fgetc(pfile);
+				colour = SDL_MapRGB(psurface->format, r, g, b);
+				pixel.x = x;
+				pixel.y = y;
+				SDL_FillRect(psurface, &pixel, colour);
+			}
 		}
 	}
 		
+	format[strcspn(format, " \t\r\n")] = '\0';
+
+	if (strcmp(format, "P3") == 0) {
+		draw_p3();
+	} else if (strcmp(format, "P6") == 0) {
+		draw_p6();
+	} else {
+		printf("PPM: Invalid format specificer\n");
+		exit(1);
+	}
+	
 	SDL_UpdateWindowSurface(pwindow);
 
 	bool app_running = true;
