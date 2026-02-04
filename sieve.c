@@ -24,16 +24,33 @@ int main(int argc, char *argv[]) {
 		print_usage();
 		exit(1);
 	}
-	char *ptemp = calloc(1000, sizeof(char));
-	// Read first line (specifier P3 or P6 - ignore here)
-	fgets(ptemp, 1000, pfile);
+	char *pline = calloc(1000, sizeof(char));
 	char *pdimensions = calloc(1000, sizeof(char));
-	// Read second line (width height)
-	fgets(pdimensions, 1000, pfile);
-	// Read third line (max colour value - ignore for now)
-	fgets(ptemp, 1000, pfile);
-	free(ptemp);
-	
+	int counter = 0;
+
+	while (fgets(pline, 1000, pfile) != NULL) {
+		// Ignore comments
+		if (pline[0] == '#') {
+			continue;
+		}
+		counter++;
+		if (counter == 1) {
+			// Read first line (specifier P3 or P6 - ignore here)
+			printf("line %d: %s", counter, pline);
+			continue;
+		} else if (counter == 2) {
+			// Read second line (width height)
+			strcpy(pdimensions, pline);
+			printf("dimensions: %s", pdimensions);
+			continue;
+		} else if (counter == 3) {
+			// Read third line (max colour value - ignore for now)
+			printf("line %d: %s", counter, pline);
+			break;
+		}
+	}
+	free(pline);
+
 	int win_w = -1;
 	int win_h = -1;
 	sscanf(pdimensions, "%d %d\n", &win_w, &win_h);
