@@ -20,10 +20,8 @@ cat <filename> | ./sieve
 ### Notes
 
 - Currently only supports .ppm image format
-- Doesn't work on PPM's that have comment lines
 
 ### ToDo
 
-- Add parsing and proper handling for max colour value and comment line
-- Add functionality to pass filename as an argument
+- Add parsing and proper handling for max colour value
 - Add support for new image formats
