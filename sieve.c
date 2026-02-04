@@ -75,8 +75,8 @@ int main(int argc, char *argv[]) {
 	Uint32 colour = 0;
 
 	void draw_p3() {
-		for (int y = 0; y <= win_h; y++) {
-			for (int x = 0; x <= win_w; x++) {			
+		for (int y = 0; y < win_h; y++) {
+			for (int x = 0; x < win_w; x++) {			
 				SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
 				fscanf(pfile, "%hhd %hhd %hhd", &r, &g, &b);
 				colour = SDL_MapRGB(psurface->format, r, g, b);
@@ -89,8 +89,8 @@ int main(int argc, char *argv[]) {
 	
 	void draw_p6() {
 		SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
-		for (int y = 0; y <= win_h; y++) {
-			for (int x = 0; x <= win_w; x++) {
+		for (int y = 0; y < win_h; y++) {
+			for (int x = 0; x < win_w; x++) {
 				r = fgetc(pfile);
 				g = fgetc(pfile);
 				b = fgetc(pfile);
