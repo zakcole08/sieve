@@ -14,7 +14,7 @@ gcc sieve.c -o sieve `sdl2-config --cflags --libs`
 ### Usage
 
 ```bash
-cat <filename> | ./sieve
+./sieve <filename>
 ```
 
 ### Notes
