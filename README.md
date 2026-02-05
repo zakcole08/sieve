@@ -4,6 +4,8 @@
 ### Install
 
 ```bash
+# Install dependencies
+sudo apt install libsdl2-ttf-dev -y
 # clone repo
 git clone https://github.com/zakcole08/sieve.git
 cd sieve
