@@ -23,7 +23,7 @@ cat <filename> | ./sieve
 
 ### ToDo
 
+- Add home page with drag and drop image UI
 - Add parsing and proper handling for max colour value
 - Add support for new image formats
-- Drag and drop image UI
 - Image resizing
