@@ -25,3 +25,5 @@ cat <filename> | ./sieve
 
 - Add parsing and proper handling for max colour value
 - Add support for new image formats
+- Drag and drop image UI
+- Image resizing
