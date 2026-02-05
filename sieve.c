@@ -5,25 +5,80 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-const char *title = "Image Viewer";
+const char *title = "Sieve - Image Viewer";
 const int pix_h = 1, pix_w = 1;
+int win_w, win_h;
+int x, y;
+FILE *pfile;
+SDL_Surface *psurface;
+SDL_Window *pwindow;
+Uint8 r, g, b;
+Uint32 colour = 0;
 
 void print_usage() {
 	printf("Usage: ./sieve <filename>\n");
 }
 
-int main(int argc, char *argv[]) {
-	if (argc < 2) {
-		printf("You must specify an image file.\n");
-		print_usage();
-		exit(1);
+void draw_p3() {
+	
+	for (int y = 0; y < win_h; y++) {
+		for (int x = 0; x < win_w; x++) {			
+			SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
+			fscanf(pfile, "%hhd %hhd %hhd", &r, &g, &b);
+			colour = SDL_MapRGB(psurface->format, r, g, b);
+			pixel.x = x;
+			pixel.y = y;
+			SDL_FillRect(psurface, &pixel, colour);
+		}
 	}
-	FILE *pfile = fopen(argv[1], "r");
+}
+
+void draw_p6() {
+	SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
+	for (int y = 0; y < win_h; y++) {
+		for (int x = 0; x < win_w; x++) {
+			r = fgetc(pfile);
+			g = fgetc(pfile);
+			b = fgetc(pfile);
+			colour = SDL_MapRGB(psurface->format, r, g, b);
+			pixel.x = x;
+			pixel.y = y;
+			SDL_FillRect(psurface, &pixel, colour);
+		}
+	}
+}
+
+void launch_home(int win_w, int win_h) {	
+	pwindow = SDL_CreateWindow(
+		title,
+		SDL_WINDOWPOS_CENTERED,
+		SDL_WINDOWPOS_CENTERED,
+		win_w,
+		win_h,
+		0
+	);
+	psurface = SDL_GetWindowSurface(pwindow);
+
+	r = 0xB5;
+	g = 0x7E;
+	b = 0xDC;
+	SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
+	colour = SDL_MapRGB(psurface->format, r, g, b);
+	pixel.x = x;
+	pixel.y = y;
+	SDL_FillRect(psurface, &pixel, colour);
+	SDL_UpdateWindowSurface(pwindow);
+	SDL_Delay(3000);
+	exit(0);
+}
+
+void launch_window(FILE *pfile) {
 	if (pfile == NULL) {
-		printf("Unable to open file %s\n", argv[1]);
-		print_usage();
-		exit(1);
+		win_w = 800;
+		win_h = 500;
+		launch_home(win_w, win_h);
 	}
+
 	char *pline = calloc(1000, sizeof(char));
 	char *pdimensions = calloc(1000, sizeof(char));
 	int counter = 0;
@@ -53,13 +108,13 @@ int main(int argc, char *argv[]) {
 	}
 	free(pline);
 
-	int win_w = -1;
-	int win_h = -1;
 	sscanf(pdimensions, "%d %d\n", &win_w, &win_h);
 	free(pdimensions);
 	printf("w=%d\nh=%d\n", win_w, win_h);
 
-  SDL_Window *pwindow = SDL_CreateWindow(
+	format[strcspn(format, " \t\r\n")] = '\0';
+
+	pwindow = SDL_CreateWindow(
 		title,
 		SDL_WINDOWPOS_CENTERED,
 		SDL_WINDOWPOS_CENTERED,
@@ -68,42 +123,7 @@ int main(int argc, char *argv[]) {
 		0
 	);
 
-	SDL_Surface *psurface = SDL_GetWindowSurface(pwindow);
-
-	Uint8 r, g, b;
-	int x = 0, y = 0;
-	Uint32 colour = 0;
-
-	void draw_p3() {
-		for (int y = 0; y < win_h; y++) {
-			for (int x = 0; x < win_w; x++) {			
-				SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
-				fscanf(pfile, "%hhd %hhd %hhd", &r, &g, &b);
-				colour = SDL_MapRGB(psurface->format, r, g, b);
-				pixel.x = x;
-				pixel.y = y;
-				SDL_FillRect(psurface, &pixel, colour);
-			}
-		}
-	}
-	
-	void draw_p6() {
-		SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
-		for (int y = 0; y < win_h; y++) {
-			for (int x = 0; x < win_w; x++) {
-				r = fgetc(pfile);
-				g = fgetc(pfile);
-				b = fgetc(pfile);
-				colour = SDL_MapRGB(psurface->format, r, g, b);
-				pixel.x = x;
-				pixel.y = y;
-				SDL_FillRect(psurface, &pixel, colour);
-			}
-		}
-	}
-		
-	format[strcspn(format, " \t\r\n")] = '\0';
-
+	psurface = SDL_GetWindowSurface(pwindow);
 	if (strcmp(format, "P3") == 0) {
 		draw_p3();
 	} else if (strcmp(format, "P6") == 0) {
@@ -112,7 +132,7 @@ int main(int argc, char *argv[]) {
 		printf("PPM: Invalid format specificer\n");
 		exit(1);
 	}
-	
+
 	SDL_UpdateWindowSurface(pwindow);
 
 	bool app_running = true;
@@ -130,3 +150,18 @@ int main(int argc, char *argv[]) {
 		}
 	}
 }
+
+int main(int argc, char *argv[]) {
+	if (argc > 1) {
+		pfile = fopen(argv[1], "r");
+		if (!pfile) {
+			printf("Unable to open file %s\n", argv[1]);
+			print_usage();
+			return 1;
+		}
+	} else {
+		pfile = NULL;
+	}
+	launch_window(pfile);
+}
+
