@@ -8,7 +8,7 @@
 git clone https://github.com/zakcole08/sieve.git
 cd sieve
 # compile
-gcc sieve.c -o sieve `sdl2-config --cflags --libs`
+gcc sieve.c -o sieve -l SDL2
 ```
 
 ### Usage
