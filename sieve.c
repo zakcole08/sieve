@@ -137,16 +137,26 @@ void generate_noise(SDL_Surface *psurface, int win_w, int win_h, int step) {
 	}
 
 	SDL_Rect pixel = {0, 0, 1, 1};
-
+	
+	Uint8 leftR, leftG, leftB, above_leftR, above_leftG, above_leftB, baseR, baseG, baseB;
+	int rng = rand() % 2;
 	for (int y = 0; y < win_h; y++) {
-		Uint8 leftR = prevR[0];
-		Uint8 leftG = prevG[0];
-		Uint8 leftB = prevB[0];
+		leftR = prevR[0];
+		leftG = prevG[0];
+		leftB = prevB[0];
 		for (int x = 0; x < win_w; x++) {
-			Uint8 baseR = (x == 0) ? prevR[x] : (leftR + prevR[x]) / 2;
-			Uint8 baseG = (x == 0) ? prevG[x] : (leftG + prevG[x]) / 2;
-			Uint8 baseB = (x == 0) ? prevB[x] : (leftB + prevB[x]) / 2;
-
+			above_leftR = (x == 0) ? prevR[x - 1] : leftR;
+			above_leftG = (x == 0) ? prevG[x - 1] : leftG;
+			above_leftB = (x == 0) ? prevB[x - 1] : leftB;
+			if (rng == 0) {
+				baseR = (x == 0) ? prevR[x] : (leftR + above_leftR) / 2;
+				baseG = (x == 0) ? prevG[x] : (leftG + above_leftG) / 2;
+				baseB = (x == 0) ? prevB[x] : (leftB + above_leftB) / 2;
+			} else {	
+				baseR = (x == 0) ? prevR[x] : (leftR + prevR[x]) / 2;
+				baseG = (x == 0) ? prevG[x] : (leftG + prevG[x]) / 2;
+				baseB = (x == 0) ? prevB[x] : (leftB + prevB[x]) / 2;;
+			}
 			Uint8 r = baseR + (rand() % (2 * step + 1) - step);
 			Uint8 g = baseG + (rand() % (2 * step + 1) - step);
 			Uint8 b = baseB + (rand() % (2 * step + 1) - step);
@@ -155,10 +165,11 @@ void generate_noise(SDL_Surface *psurface, int win_w, int win_h, int step) {
 			prevG[x] = g;
 			prevB[x] = b;
 
-			leftR = r;
-			leftG = g;
-			leftB = b;
-
+			if (rng != 0) {
+				leftR = r;
+				leftG = g;
+				leftB = b;
+			}
 			pixel.x = x;
 			pixel.y = y;
 
@@ -180,6 +191,7 @@ void launch_home(int win_w, int win_h) {
 	psurface = SDL_GetWindowSurface(pwindow);
 	
 	int step = 1;
+
 	generate_noise(psurface, win_w, win_h, step);
 
 	SDL_UpdateWindowSurface(pwindow);
