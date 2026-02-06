@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <time.h>
 
 const char *title = "Sieve - Image Viewer";
 const int pix_h = 1, pix_w = 1;
@@ -121,6 +122,52 @@ void launch_window(FILE *pfile) {
 	}
 }
 
+void generate_noise(SDL_Surface *psurface, int win_w, int win_h, int step) {
+	srand((unsigned int)time(NULL));
+	
+	Uint8 prevR[win_w];
+	Uint8 prevG[win_w];
+	Uint8 prevB[win_w];
+
+	// seed first row
+	for (int x = 0; x < win_w; x++) {
+		prevR[x] = rand() % 256;
+		prevG[x] = rand() % 256;
+		prevB[x] = rand() % 256;
+	}
+
+	SDL_Rect pixel = {0, 0, 1, 1};
+
+	for (int y = 0; y < win_h; y++) {
+		Uint8 leftR = prevR[0];
+		Uint8 leftG = prevG[0];
+		Uint8 leftB = prevB[0];
+		for (int x = 0; x < win_w; x++) {
+			Uint8 baseR = (x == 0) ? prevR[x] : (leftR + prevR[x]) / 2;
+			Uint8 baseG = (x == 0) ? prevG[x] : (leftG + prevG[x]) / 2;
+			Uint8 baseB = (x == 0) ? prevB[x] : (leftB + prevB[x]) / 2;
+
+			Uint8 r = baseR + (rand() % (2 * step + 1) - step);
+			Uint8 g = baseG + (rand() % (2 * step + 1) - step);
+			Uint8 b = baseB + (rand() % (2 * step + 1) - step);
+
+			prevR[x] = r;
+			prevG[x] = g;
+			prevB[x] = b;
+
+			leftR = r;
+			leftG = g;
+			leftB = b;
+
+			pixel.x = x;
+			pixel.y = y;
+
+			Uint32 colour = SDL_MapRGB(psurface->format, r, g, b);
+			SDL_FillRect(psurface, &pixel, colour);
+		}
+	}
+}
+
 void launch_home(int win_w, int win_h) {	
 	pwindow = SDL_CreateWindow(
 		title,
@@ -131,29 +178,9 @@ void launch_home(int win_w, int win_h) {
 		0
 	);
 	psurface = SDL_GetWindowSurface(pwindow);
-
-	Uint8 rmin, rmax, gmin, gmax, bmin, bmax;
-	r = (Uint8) rand();
-	g = (Uint8) rand();
-	b = (Uint8) rand();
-	SDL_Rect pixel = (SDL_Rect){x, y, pix_h, pix_w};
-	for (int y = 0; y < win_h; y++) {
-		for (int x = 0; x < win_w; x++) {			
-			rmin = r - 1;
-			rmax = r + 1;
-			gmin = g - 1;
-			gmax = g + 1;
-			bmin = b - 1;
-			bmax = b + 1;
-			r = rand() % (rmax - rmin + 1) + rmin;
-			g = rand() % (gmax - gmin + 1) + gmin;
-			b = rand() % (bmax - bmin + 1) + bmin;
-			colour = SDL_MapRGB(psurface->format, r, g, b);
-			pixel.x = x;
-			pixel.y = y;
-			SDL_FillRect(psurface, &pixel, colour);
-		}
-	}
+	
+	int step = 1;
+	generate_noise(psurface, win_w, win_h, step);
 
 	SDL_UpdateWindowSurface(pwindow);
 	
