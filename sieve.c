@@ -177,6 +177,7 @@ void generate_noise(SDL_Surface *psurface, int win_w, int win_h, int step) {
 			SDL_FillRect(psurface, &pixel, colour);
 		}
 	}
+	SDL_UpdateWindowSurface(pwindow);
 }
 
 void launch_home(int win_w, int win_h) {	
@@ -191,10 +192,7 @@ void launch_home(int win_w, int win_h) {
 	psurface = SDL_GetWindowSurface(pwindow);
 	
 	int step = 1;
-
 	generate_noise(psurface, win_w, win_h, step);
-
-	SDL_UpdateWindowSurface(pwindow);
 	
 	SDL_Event event;
 	SDL_EventState(SDL_DROPFILE, SDL_ENABLE);
